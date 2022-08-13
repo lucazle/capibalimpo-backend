@@ -8,6 +8,10 @@ const cadastrarVol = async (req, res) => {
 
     const volExiste = await Voluntario.findOne({ email: email })
 
+    if(senha != confirm_senha) {
+        return res.status(422).json({ msg: "As senhas não conferem"})
+    }
+
     if(volExiste) {
          return res.status(422).json({ msg: "Este e-mail já está cadastrado!" })
     }
@@ -54,6 +58,7 @@ const cadastrarVol = async (req, res) => {
 
     }
 }
+
 const exibirVol = async (req, res) => {
 
     const id = req.params.id

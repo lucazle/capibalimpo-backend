@@ -7,6 +7,7 @@ const {authCheckVol, authCheckAdmin} = require ('../app/controllers/authControll
 const {formsApo} = require ('../app/controllers/apoiadorController')
 const {cadastroAdmin, exibirAdmin, atualizarAdmin, exibirForm, apoAprovado, apoNegado, cadastroEvento, mostrarEventos, atualizarEvento, deletarEvento} = require ('../app/controllers/adminController')
 const {checkToken} = require ('../app/middlewares/jwt')
+const {sendMailToChangePassword, confirmarTrocar} = require ('../app/controllers/trocaDeSenhaController')
 
 
 //rotas voluntário
@@ -33,6 +34,10 @@ routes.post('/eventos/cadastro', cadastroEvento);
 routes.get('/eventos', mostrarEventos);
 routes.put('/eventos/atualizar/:id', atualizarEvento);
 routes.delete('/eventos/:id', deletarEvento)
+
+//
+routes.post('/recuperarsenha', sendMailToChangePassword)
+routes.get("/confirmar/:id/:senha", confirmarTrocar)
 
 /*rotas adm
 get p buscar todas solicitações pendentes ou seja a coluna approved esta null
