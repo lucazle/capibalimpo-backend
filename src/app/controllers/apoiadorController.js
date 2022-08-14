@@ -21,7 +21,7 @@ const formsApo = async (req, res) => {
       });
       transporter.sendMail({
           from: 'capibalimpo@gmail.com',
-          to: req.body.email,
+          to: apoiador.email,
           subject: 'Solicitação em análise :)',
           text: `Olá ${apoiador.nome}, nós do CampibaLimpo ficamos muito felizes em saber que você gostaria de fazer parte do nosso projeto! Estaremos avaliando a sua solicitação e enviando uma resposta nos próximos dias :)`
       }, (err, info) => {

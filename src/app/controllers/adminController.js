@@ -3,37 +3,24 @@ const Admin = require('../models/admin');
 const Evento = require('../models/evento');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
+const sendMail = require("../../modules/contaCriada_mailer");
+
 
 // login
 const cadastroAdmin = async (req, res) => {
 
     const {nome, email, senha, confirm_senha} = req.body;
 
-    if (!nome) {
-        return res.status(422).json({msg: "O nome é obrigatório!"})
-    }
-
-    if (!email) {
-        return res.status(422).json({msg: "O email é obrigatório!"})
-    }
-
-    if (!senha) {
-        return res.status(422).json({msg: "A senha é obrigatória!"})
-    }
-
-    if (senha !== confirm_senha) {
-        return res.status(422).json({msg: "As senhas não conferem!"})
-    }
+    if (!nome) return res.status(422).json({msg: "O nome é obrigatório!"})
+    if (!email) return res.status(422).json({msg: "O email é obrigatório!"})
+    if (!senha) return res.status(422).json({msg: "A senha é obrigatória!"})
+    if (senha !== confirm_senha) return res.status(422).json({msg: "As senhas não conferem!"})
 
     const AdminExiste = await Admin.findOne({email: email})
 
-    if (AdminExiste) {
-        return res.status(422).json({msg: "Este e-mail já está cadastrado!"})
-    }
+    if (AdminExiste) return res.status(422).json({msg: "Este e-mail já está cadastrado!"})
 
-    const salt = await bcrypt.genSalt(12)
-    const senhaHash = await bcrypt.hash(senha, salt)
-
+    const senhaHash = await bcrypt.hash(senha, 12)
     const admin = {
         nome,
         email,
@@ -66,24 +53,20 @@ const exibirAdmin = async (req, res) => {
             res.status(422).json({message: 'O administrador não foi encontrado!'})
             return
         }
-
         res.status(200).json(form)
 
     } catch (error) {
-
         message = "Não foi possível encontrar o administrador. Erro: " + error
         res.status(500).json({erro: message});
-
     }
 }
 
 // atualizar dados
 const atualizarAdmin = async (req, res) => {
+    //necessário digitar a senha para confirmar a atualização.
 
     const id = req.params.id
-
     const {nome, email, senha, confirm_senha} = req.body;
-
     const adminExiste = await Admin.findOne({email: email})
 
     if (adminExiste) {
@@ -95,7 +78,6 @@ const atualizarAdmin = async (req, res) => {
     }
 
     const hashPassword = await bcrypt.hash(senha, 12);
-
     const admin = {
         nome,
         email,
@@ -103,14 +85,12 @@ const atualizarAdmin = async (req, res) => {
     };
 
     try {
-
         const updatedAdmin = await Admin.findByIdAndUpdate(id, admin, {new: true});
 
         if (updatedAdmin.matchedCount === 0) {
             res.status(422).json({message: 'O voluntário não foi encontrado!'})
             return
         }
-
         res.status(200).json({message: 'Atualização efetuada com sucesso!'})
 
     } catch (error) {
@@ -145,7 +125,6 @@ const exibirForm = async (req, res) => {
 const apoAprovado = async (req, res) => {
 
     const id = req.params.id
-
     const {nome, email, avaliacao} = req.body;
     const avaliar = {
         nome,
@@ -157,8 +136,8 @@ const apoAprovado = async (req, res) => {
         port: 465,
         host: "smtp.gmail.com",
         auth: {
-          user: "capibalimpo@gmail.com",
-          pass: "zhwamuvdlxzpwlll",
+          user: process.env.MAILER_USER,
+          pass: process.env.MAILER_PASS,
         },
         secure: true,
       });
@@ -166,14 +145,14 @@ const apoAprovado = async (req, res) => {
           from: 'capibalimpo@gmail.com',
           to: req.body.email,
           subject: 'Solicitação aprovada! :)',
-          text: `Olá ${avaliar.nome}, nós do CampibaLimpo ficamos muito felizes em informar que sua solicitação foi aceita com sucesso pela nossa equipe!`
+          text: `Olá ${req.body.nome}, nós do CampibaLimpo ficamos muito felizes em informar que sua 
+                solicitação foi aceita com sucesso pela nossa equipe!`
       }, (err, info) => {
           console.log(info.envelope);
           console.log(info.messageId);
       })
 
     try {
-
         const updatedApoiador = await Apoiador.findOneAndUpdate({
             _id: id
         }, avaliar)
@@ -182,16 +161,12 @@ const apoAprovado = async (req, res) => {
             res.status(422).json({message: 'O formulário não foi encontrado!'})
             return
         }
-
         res.status(201).json({message: "Formulário aprovado com sucesso!"})
 
     } catch (error) {
-
         message = "Não foi possível aprovar o formulário. Erro: " + error
         res.status(500).json({erro: message});
-
     }
-
 }
 
 const apoNegado = async (req, res) => {
@@ -199,7 +174,7 @@ const apoNegado = async (req, res) => {
     const id = req.params.id
 
     const {nome, email, avaliacao, justificativa} = req.body;
-    const avaliar = {
+    const apoiador = {
         nome,
         email,
         avaliacao,
@@ -210,41 +185,34 @@ const apoNegado = async (req, res) => {
         port: 465,
         host: "smtp.gmail.com",
         auth: {
-          user: "capibalimpo@gmail.com",
-          pass: "zhwamuvdlxzpwlll",
+          user: process.env.MAILER_USER,
+          pass: process.env.MAILER_PASS,
         },
         secure: true,
       });
       transporter.sendMail({
           from: 'capibalimpo@gmail.com',
-          to: req.body.email,
+          to: apoiador.email,
           subject: 'Solicitação negada! :(',
-          text: `Olá ${avaliar.nome}, nós do CampibaLimpo ficamos muito agradecidos por ter enviado sua solicitação mas infelizmente não foi aceita :(\n\n Justificativa: \n\n${avaliar.justificativa} `
+          text: `Olá ${apoiador.nome}, nós do CampibaLimpo ficamos muito agradecidos por ter enviado sua solicitação mas infelizmente não foi aceita :(\n\n Justificativa: \n\n${apoiador.justificativa} `
       }, (err, info) => {
-          console.log(info.envelope);
-          console.log(info.messageId);
+          console.log(err);
+          console.log(err);
       })
 
     try {
-
-        const updatedApoiador = await Apoiador.findOneAndUpdate({
-            _id: id
-        }, avaliar)
+        const updatedApoiador = await Apoiador.findByIdAndUpdate(id, apoiador)
 
         if (updatedApoiador === 0) {
             res.status(422).json({message: 'O formulário não foi encontrado!'})
             return
         }
-
         res.status(201).json({message: "Formulário negado com sucesso!"})
 
     } catch (error) {
-
         message = "Não foi possível aprovar o formulário. Erro: " + error
         res.status(500).json({erro: message});
-
     }
-
 }
 
 // evento
