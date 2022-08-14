@@ -16,6 +16,9 @@ routes.post('/cadastrovol', cadastrarVol);
 routes.get('/perfilvol/:id', checkToken, exibirVol);
 routes.put('/perfilvol/:id', atualizarVol);
 routes.delete('/perfilvol/:id', deletarVol);
+    //recuperar senha
+routes.post('/recuperarsenha', sendMailToChangePassword)
+routes.get("/confirmar/:id/:senha", confirmarTrocar)
 
 //rotas apoiador
 routes.post('/formularioapoiador', formsApo);
@@ -35,18 +38,8 @@ routes.get('/eventos', mostrarEventos);
 routes.put('/eventos/atualizar/:id', atualizarEvento);
 routes.delete('/eventos/:id', deletarEvento)
 
-//
+//Recuperar senha
 routes.post('/recuperarsenha', sendMailToChangePassword)
 routes.get("/confirmar/:id/:senha", confirmarTrocar)
-
-/*rotas adm
-get p buscar todas solicitações pendentes ou seja a coluna approved esta null
-
-put p alterar a coluna approved para qnd a solicitação for aprovada / 
-alterar as colunas approved e uma justificativa qnd for negada 
-
-*lembrar de enviar email de confirm de solicitação e de cadastro e lembrar de enviar email com retorno
-da solicitação de foi approved ou n
-*/
 
 module.exports={routes}

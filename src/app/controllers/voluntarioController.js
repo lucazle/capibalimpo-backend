@@ -31,8 +31,8 @@ const cadastrarVol = async (req, res) => {
               port: 465,
               host: "smtp.gmail.com",
               auth: {
-                user: "capibalimpo@gmail.com",
-                pass: "zhwamuvdlxzpwlll",
+                user: process.env.MAILER_USER,
+                pass: process.env.MAILER_PASS,
               },
               secure: true,
             });
@@ -40,10 +40,10 @@ const cadastrarVol = async (req, res) => {
                 from: 'capibalimpo@gmail.com',
                 to: req.body.email,
                 subject: 'Conta Criada! :)',
-                text: `Olá ${voluntario.nome}, nós do CampibaLimpo ficamos muito felizes em saber que você gostaria de fazer parte do nosso projeto! Acesse o site e marque uma data! :)`
+                text: `Olá ${voluntario.nome}, nós do CampibaLimpo ficamos muito felizes em saber que você gostaria de fazer parte do nosso projeto! Acesse o site e agende uma data! :)`
             }, (err, info) => {
-                console.log(info.envelope);
-                console.log(info.messageId);
+                console.log(err);
+                console.log(err);
             })
         
     try{
@@ -146,10 +146,6 @@ const deletarVol = async (req, res) => {
 
     }
 
-}
-
-const recSenha = async (req, res) => {
-    
 }
 
 module.exports = {cadastrarVol, exibirVol, atualizarVol, deletarVol}

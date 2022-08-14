@@ -14,8 +14,8 @@ const formsApo = async (req, res) => {
         port: 465,
         host: "smtp.gmail.com",
         auth: {
-          user: "capibalimpo@gmail.com",
-          pass: "zhwamuvdlxzpwlll",
+            user: process.env.MAILER_USER,
+            pass: process.env.MAILER_PASS,
         },
         secure: true,
       });
