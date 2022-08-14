@@ -16,13 +16,5 @@ const DataSchema = new mongoose.Schema({
     }
 });
 
-DataSchema.pre('findByIdAndUpdate', async function (next) {
-    var password = await this.getUpdate().senha + '';
-    if (password.length < 55) {
-        this.getUpdate().senha = await bcrypt.hash(password, 12);
-    }
-    next();
-});
-
 const admin = mongoose.model('Admin', DataSchema);
 module.exports = admin;

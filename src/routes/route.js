@@ -40,6 +40,6 @@ routes.delete('/eventos/:id', deletarEvento)
 
 //Recuperar senha
 routes.post('/recuperarsenha', sendMailToChangePassword)
-routes.get("/confirmar/:id/:senha", confirmarTrocar)
+routes.get('/confirmar/:id/:senha', confirmarTrocar)
 
 module.exports={routes}
