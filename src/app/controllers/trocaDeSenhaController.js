@@ -5,7 +5,6 @@ const sendMail = require("../../modules/contaCriada_mailer");
 const sendMailToChangePassword = async (req, res) => {
 
   const {senha, email} = req.body
-  const _id = req.params.id;
 
     const usuario = await Voluntario.findOne({email:email});
 
@@ -25,7 +24,7 @@ const sendMailToChangePassword = async (req, res) => {
           to: usuario.email,
           subject: 'Confirma alteração de senha?',
           text: `Olá ${usuario.nome}, clique no link para confirmar a alteração da senha!\n` 
-            + process.env.APIBASEURL+ "/confirmar/" + _id + "/" + senha
+            + process.env.APIBASEURL+ "/confirmar/" + usuario._id + "/" + senha
       }, (err, info) => {
         console.log(info.envelope);
         console.log(info.messageId);

@@ -126,10 +126,10 @@ const apoAprovado = async (req, res) => {
 
     const id = req.params.id
     const {nome, email, avaliacao} = req.body;
-    const avaliar = {
+    const apoiador = {
         nome,
         email,
-        avaliacao,
+        avaliacao
     };
 
     const transporter = nodemailer.createTransport({
@@ -143,19 +143,18 @@ const apoAprovado = async (req, res) => {
       });
       transporter.sendMail({
           from: 'capibalimpo@gmail.com',
-          to: req.body.email,
+          to: apoiador.email,
           subject: 'Solicitação aprovada! :)',
-          text: `Olá ${req.body.nome}, nós do CampibaLimpo ficamos muito felizes em informar que sua 
-                solicitação foi aceita com sucesso pela nossa equipe!`
+          text: `Olá ${apoiador.nome}, nós do CampibaLimpo ficamos muito felizes em informar que sua solicitação foi aceita com sucesso pela nossa equipe!`
       }, (err, info) => {
-          console.log(info.envelope);
-          console.log(info.messageId);
+          console.log(err);
+          console.log(err);
       })
 
     try {
         const updatedApoiador = await Apoiador.findOneAndUpdate({
             _id: id
-        }, avaliar)
+        }, apoiador)
 
         if (updatedApoiador === 0) {
             res.status(422).json({message: 'O formulário não foi encontrado!'})
